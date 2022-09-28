@@ -1,12 +1,14 @@
 
 from SearchAgent import SearchAgent
 from Node import Node
+from SavedGraph import *
 from browser import document, window
-import javascript
+import javascript, json
 
 #changes_made = False
 def update_graph():
-    global any_change, colors_to_fill_inside, agent, radius, colors_for_border, node_type, animate, val, ctx, border, node_selected
+    global any_change, colors_to_fill_inside, agent, radius, colors_for_border, node_type \
+        ,animate, val, ctx, border, node_selected, selected_algorithm 
 
     def draw_weights(node1, node2):
         global ctx
@@ -49,6 +51,7 @@ def update_graph():
         ctx.font = "20px Arial"
         ctx.textBaseline = "middle"
         ctx.fillText(node, x, y - 5)
+        #print(x,y)
 
         draw_heuristics(node)
 
@@ -57,6 +60,7 @@ def update_graph():
         x1, y1 = agent.graph[node1].position
         x2, y2 = agent.graph[node2].position
 
+        
         ctx.beginPath()
         if flag == 0:
             ctx.strokeStyle = 'black' 
@@ -72,25 +76,30 @@ def update_graph():
             draw_weights(node1, node2)
     
     def animate_graph():
-        global node_type
-        print("Inside 'animate_graph' : ", val)
-        start = val[0]
-        for node in val[1:]:
-            end = node
-            print("start : ",start,"End : ",end)
-            draw_edges(start, end, 1)
-            start = end
-        for circle_node in agent.graph.keys():
-            if agent.start == circle_node:
-                node_type = 'start'
-            elif agent.goal == circle_node:
-                node_type = 'goal'
-            else:
-                node_type = 'normal'
-            draw_circle(circle_node)
+        global node_type, val, selected_algorithm
+
+        #print("inside animate", val)
+        if selected_algorithm not in ['dfs', 'bfs']:
+            val = val[1:]
+        
+        for iter in range(1):
+            start = val[0]
+            for node in val[1:]:
+                end = node
+                print("start : ",start,"End : ",end)
+                draw_edges(start, end, 1)
+                start = end
+            for circle_node in agent.graph.keys():
+                if agent.start == circle_node:
+                    node_type = 'start'
+                elif agent.goal == circle_node:
+                    node_type = 'goal'
+                else:
+                    node_type = 'normal'
+                draw_circle(circle_node)
 
     if any_change:
-        print("inside update graph")
+        #print("inside update graph")
         ctx.clearRect(0, 0, document['canvas'].offsetWidth, document['canvas'].offsetHeight)
         
         visited = []
@@ -117,16 +126,28 @@ def update_graph():
             animate = False
 
         any_change = False
+        #ob_to_json =  json.dumps(agent.__dict__)
+        #window.localStorage.setItem("GRAPH", ob_to_json)
+        #window.localStorage.setItem("GRAPH", "data")
 
+    
     if agent.status == 'searching':
+        #print("Check inside [window.timeout agent_search]")
         window.setTimeout(agent_search, 24)
+    
+    
 
 def solve(algo):
-    global agent, yield_result, any_change
+    global agent, yield_result, any_change, result
     agent.status = 'searching'
-    yield_result = map_algorithm[algo]()
-    print("Started result")
-    update_graph()
+    if algo in ['bfs','dfs']:
+        yield_result = map_algorithm[algo]()
+        print("Started result")
+        update_graph()
+    else:
+        result = map_algorithm[algo]()
+        print("Else", result)
+        update_graph()
 
     
 def next_iteration():
@@ -135,24 +156,54 @@ def next_iteration():
     val = next(yield_result)
 
 def agent_search():
-    global any_change, start_time, animate
+    global any_change, start_time, animate, selected_algorithm, result, val, i, j
+    
     if agent.status == 'searching':
-        try:
-            now_time = javascript.Date.now()
-            if now_time - start_time >= 800:
-                next_iteration()
-                any_change = True
-                animate = True
-                window.setTimeout(update_graph, 10)
-                start_time = now_time
-            else:
-                update_graph()
-        except Exception as e:
-            print("Exception")
-            agent.status = 'idle'
+        if selected_algorithm in ['bfs','dfs']:
+            try:
+                now_time = javascript.Date.now()
+                if now_time - start_time >= 800:
+                    next_iteration()
+                    any_change = True
+                    animate = True
+                    window.setTimeout(update_graph, 10)
+                    start_time = now_time
+                else:
+                    update_graph()
+            except Exception as e:
+                print("Exception")
+                agent.status = 'idle'
+        else:
+            Len = len(result[i])
+            #print("Check inside agent_search", Len)
+            try:
+                now_time = javascript.Date.now()
+                if now_time - start_time >= 800:
+                    #print(i,j)
+                    if j < Len:
+                        val = result[i][j]
+                        j += 1
+                    else:
+                        j = 0
+                        i += 1
+                        val = result[i][j]
+                        j += 1
+                        """update_graph()"""
+                    print("After ", i,j)
+                    any_change = True
+                    animate = True
+                    window.setTimeout(update_graph, 10)
+                    start_time = now_time
+                else:
+                    print("---------")
+                    update_graph()
+            except Exception as e:
+                i = 0
+                print("Exception ", e)
+                agent.status = 'idle'
             
 def graph_setup(event):
-    global tool, counter, any_change, node_selected, selected_node_, From, To
+    global tool, counter, any_change, node_selected, selected_node_, From, To, node_heur
     def find_edge_ends(radius): # Finding edge ends to update weight of that edge
         visited = []
         for node in agent.graph.values():
@@ -180,7 +231,7 @@ def graph_setup(event):
     # x and y co-ordinates
     x = event.x - 240
     y = event.y - 26
-
+    print(x,y)
     node_name = find_node()
     if node_name == -1:
         if tool == "nodeAdd":
@@ -221,8 +272,8 @@ def graph_setup(event):
                 agent.start = None
 
             # Deleting node's children
-            for child in agent.graph[start_node].children.keys():
-                del agent.graph[child].children[start_node]
+            for child in agent.graph[node_name].children.keys():
+                del agent.graph[child].children[node_name]
 
             # Deleting node itself
             del agent.graph[node_name]
@@ -312,6 +363,7 @@ def graph_setup(event):
 
 
         elif tool == "heuristics":
+            node_heur = node_name
             DialogBoxVisibility(True)
 
         
@@ -357,7 +409,7 @@ def heuristicsUpdate():
     validated = document["weights-form"].reportValidity()
     if validated:
         result = document["weights-input"].value
-        agent.graph[node_name].heuristics = result
+        agent.graph[node_heur].heuristics = result
         any_change = True
 
 def tool_select(do):
@@ -368,7 +420,13 @@ def algo_select(algo):
     global selected_algorithm
     selected_algorithm = algo
 
+def saved_graph():
+    global any_change, agent, counter
+    agent.graph, c = G2()
 
+    counter = c 
+    any_change = True
+    update_graph()
 
 canvas = document["canvas"]
 ctx = canvas.getContext("2d")
@@ -403,14 +461,17 @@ animate = False
 
 # variable to hold iterator of yield and individual yielded value
 yield_result = None
+result = None
 val = None
+node_heur = None
+i = 0; j = 0
 
 # For edge manipulation - Adding and deleting
 From = None
 To = None
 
 agent = SearchAgent()
-map_algorithm = {'bfs' : agent.bfs, 'dfs' : agent.dfs \
+map_algorithm = {'bfs' : agent.bfs, 'dfs' : agent.dfs , 'hc' : agent.hc \
     ,'bs' : agent.bs, 'bb' : agent.bb, 'bb-h' : agent.bb_h, 'astar' : agent.a_star }
 
 
@@ -444,6 +505,11 @@ document['solve'].bind('click', lambda e: solve(selected_algorithm))
 
 # To set up graph -> Node creation, node deletion, edge creation, edge deletion
 document['canvas'].bind('mousedown', lambda e: graph_setup(e))
+
+# For using localstorage data 
+document['saved'].bind('click', lambda e: saved_graph())
+
+#document["floatingSelect"].bind('click', lambda e: print("OK"))
 
 # Keeping track of start time to use while animating the graph in proper interval
 start_time = javascript.Date.now()
