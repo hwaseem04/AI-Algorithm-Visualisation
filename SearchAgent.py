@@ -254,7 +254,53 @@ class SearchAgent:
     def a_star(self):
         if self.goal == None or len(self.graph) < 2:
             return
-
+        # Extended list
+        visited = {key : 0 for key in self.graph}
+        self.queue = [[0, self.start]]
+        Final_result = []
+        while len(self.queue) != 0:
+            sub_list = []
+            #temp = self.queue[0]
+            choosen_node = self.queue[0][-1]
+            for child_node in self.graph[choosen_node].children.keys():
+                if child_node in self.queue[0]:
+                    continue
+                if visited[child_node] == 1:
+                    continue
+                else:
+                    visited[child_node] = 1
+                element = self.queue[0] + [child_node]
+                # Update weight
+                element[0] += self.graph[choosen_node].children[child_node]
+                # Update heuristc aptly
+                prev_node = element[-2]
+                if prev_node != self.start:
+                    
+                    element[0] += (self.graph[child_node].heuristics - self.graph[prev_node].heuristics)
+                    #print(element)
+                else:
+                    
+                    element[0] += (self.graph[child_node].heuristics)
+                    #print(element)
+                sub_list.append(element)
+                
+                if self.goal in element:
+                    Final_result.append([element])
+                    print("GOAL")
+                    return Final_result
+                
+            self.queue.pop(0)
+            if len(sub_list) == 0:
+                continue
+            sub_list = sorted(sub_list)
+            for elem in sub_list:
+                self.priority_queue(elem)
+            
+            Final_result.append(sub_list)
+            print(sub_list)
+            print(self.queue)
+            print("-------------")
+        
     def priority_queue(self, element):
         
         if len(self.queue) == 0:
