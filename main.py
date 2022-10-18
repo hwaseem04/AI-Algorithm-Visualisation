@@ -1,15 +1,16 @@
 
+from re import A
 from SearchAgent import SearchAgent
 from Node import Node
 from SavedGraph import *
-from browser import document, window
+from browser import document, window, alert
 import javascript, json
 
 #changes_made = False
 def update_graph():
     global any_change, colors_to_fill_inside, agent, radius, colors_for_border, node_type \
         ,animate, val, ctx, border, node_selected, selected_algorithm 
-
+    #update_canvas_size()
     def draw_weights(node1, node2):
         global ctx
         ctx.font = "18px Arial"
@@ -99,9 +100,9 @@ def update_graph():
                 draw_circle(circle_node)
 
     if any_change:
-        #print("inside update graph")
-        ctx.clearRect(0, 0, document['canvas'].offsetWidth, document['canvas'].offsetHeight)
         
+        ctx.clearRect(0, 0, document['canvas'].offsetWidth, document['canvas'].offsetHeight)
+        #alert("inside update graph")
         visited = []
         for node in agent.graph.keys():
             if (node == agent.goal):
@@ -126,9 +127,7 @@ def update_graph():
             animate = False
 
         any_change = False
-        #ob_to_json =  json.dumps(agent.__dict__)
-        #window.localStorage.setItem("GRAPH", ob_to_json)
-        #window.localStorage.setItem("GRAPH", "data")
+
 
     
     if agent.status == 'searching':
@@ -157,12 +156,12 @@ def next_iteration():
 
 def agent_search():
     global any_change, start_time, animate, selected_algorithm, result, val, i, j
-    
+    set_speed()
     if agent.status == 'searching':
         if selected_algorithm in ['bfs','dfs']:
             try:
                 now_time = javascript.Date.now()
-                if now_time - start_time >= 800:
+                if now_time - start_time >= speed:
                     next_iteration()
                     any_change = True
                     animate = True
@@ -178,7 +177,7 @@ def agent_search():
             #print("Check inside agent_search", Len)
             try:
                 now_time = javascript.Date.now()
-                if now_time - start_time >= 800:
+                if now_time - start_time >= speed:
                     #print(i,j)
                     if j < Len:
                         val = result[i][j]
@@ -422,11 +421,39 @@ def algo_select(algo):
 
 def saved_graph():
     global any_change, agent, counter
-    agent.graph, c = G2()
+    graph = int(document['Select'].value)
+    
+    if graph == 1:
+        #alert("inside 1")
+        agent.graph, c = G1()
+    elif graph == 2:
+        #alert("inside 2")
+        agent.graph, c = G2()
 
     counter = c 
     any_change = True
     update_graph()
+
+def update_canvas_size():
+    global window_width, window_height
+
+    window_width = window.innerWidth
+    window_height = window.innerHeight
+
+    canvas["width"] = window_width
+    canvas["height"] = window_height
+
+def set_speed():
+    global speed
+    value = document['Speed'].value
+    if value == '2x':
+        speed = 200
+    elif value == '1.5x':
+        speed = 600
+    else:
+        speed = 800
+    #alert(speed)
+
 
 canvas = document["canvas"]
 ctx = canvas.getContext("2d")
@@ -470,6 +497,10 @@ i = 0; j = 0
 From = None
 To = None
 
+# set speed
+speed = 800
+
+
 agent = SearchAgent()
 map_algorithm = {'bfs' : agent.bfs, 'dfs' : agent.dfs , 'hc' : agent.hc \
     ,'bs' : agent.bs, 'bb' : agent.bb, 'bb-h' : agent.bb_h, 'astar' : agent.a_star }
@@ -506,10 +537,10 @@ document['solve'].bind('click', lambda e: solve(selected_algorithm))
 # To set up graph -> Node creation, node deletion, edge creation, edge deletion
 document['canvas'].bind('mousedown', lambda e: graph_setup(e))
 
-# For using localstorage data 
-document['saved'].bind('click', lambda e: saved_graph())
+document["Select"].bind('change', lambda e: saved_graph())
 
-#document["floatingSelect"].bind('click', lambda e: print("OK"))
+document["Speed"].bind('change', lambda e: set_speed())
+
 
 # Keeping track of start time to use while animating the graph in proper interval
 start_time = javascript.Date.now()
