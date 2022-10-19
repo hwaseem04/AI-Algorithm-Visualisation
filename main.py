@@ -171,6 +171,8 @@ def agent_search():
                     update_graph()
             except Exception as e:
                 print("Exception")
+                #alert("test")
+                document.getElementById("enqueue").innerHTML = agent.no_enqueue;
                 agent.status = 'idle'
         else:
             Len = len(result[i])
@@ -199,7 +201,10 @@ def agent_search():
             except Exception as e:
                 i = 0
                 print("Exception ", e)
+                #alert("test")
+                document.getElementById("enqueue").innerHTML = agent.no_enqueue;
                 agent.status = 'idle'
+
             
 def graph_setup(event):
     global tool, counter, any_change, node_selected, selected_node_, From, To, node_heur

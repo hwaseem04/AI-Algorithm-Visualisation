@@ -8,6 +8,7 @@ class SearchAgent:
         self.goal = goal
         self.status = status
         self.queue = []
+        self.no_enqueue = 0
 
     def dfs(self):
         if self.goal == None or len(self.graph) < 2:
@@ -15,9 +16,10 @@ class SearchAgent:
         """print(self.graph)
         print(self.start)
         print(self.goal)"""
-
+        self.no_enqueue = 0
         queue = []
         for child_node in self.graph[self.start].children.keys():
+            self.no_enqueue += 1
             queue.append([self.start, child_node])
         
         queue = sorted(queue)
@@ -33,18 +35,22 @@ class SearchAgent:
             for child_node in self.graph[current_node].children.keys():
                 if child_node not in queue[0]:
                     temp = queue[0] + [child_node]
+                    self.no_enqueue += 1
                     queue.insert(1,temp)
             yield queue.pop(0)
             
             queue = sorted(queue)
         self.status = 'idle'
+        
 
 
     def bfs(self):
         if self.goal == None or self.start == None or len(self.graph) < 2: ## Create a dialog box to notify user
             return
+        self.no_enqueue = 0
         queue = []
         for child in self.graph[self.start].children.keys():
+            self.no_enqueue += 1
             queue.append([self.start, child])
             
         queue = sorted(queue)
@@ -63,6 +69,7 @@ class SearchAgent:
                 for child in self.graph[current_node].children.keys() :
                     if child not in queue[k]:
                         temp = queue[k] + [child]
+                        self.no_enqueue += 1
                         queue.append(temp)
                     
             queue = queue[length:]
@@ -84,7 +91,7 @@ class SearchAgent:
     def hc(self):
         if self.goal == None or len(self.graph) < 2:
             return
-
+        self.no_enqueue = 0
         Final_result = []
         self.queue = [[int(self.graph[self.start].heuristics), self.start]]
 
@@ -97,11 +104,13 @@ class SearchAgent:
                 if child_node in self.queue[0]:
                     continue
                 element = self.queue[0] + [child_node]
+                self.no_enqueue += 1
                 element[0] = int(self.graph[child_node].heuristics)
                 #print(element)
                 sub_list.append(element)
                 #self.priority_queue(element)
                 if self.goal in element:
+                    self.no_enqueue += 1
                     Final_result.append([element])
                     print("GOAL")
                     return Final_result
@@ -123,7 +132,7 @@ class SearchAgent:
         if self.goal == None or len(self.graph) < 2:
             return
         # Beam search
-        
+        self.no_enqueue = 0
         B = 3
         Final_result = []
         self.queue = []
@@ -132,7 +141,9 @@ class SearchAgent:
             element = [int(self.graph[child_node].heuristics), self.start, child_node]
             #print(element)
             self.priority_queue(element)
+            self.no_enqueue += 1
             if self.goal in element:
+                self.no_enqueue += 1
                 Final_result.append([element])
                 print(Final_result)
                 print("GOAL")
@@ -151,12 +162,14 @@ class SearchAgent:
                     if child_node in temp_queue[i]:  # To avoid tail biting
                         continue 
                     element = temp_queue[i] + [child_node]
+                    self.no_enqueue += 1
                     element[0] = int(self.graph[child_node].heuristics)
                     #print(element)
                     self.priority_queue(element)
                     
                     if self.goal in element:
                         Final_result.append([element])
+                        self.no_enqueue += 1
                         print(Final_result)
                         print("GOAL")
                         return Final_result
@@ -175,7 +188,7 @@ class SearchAgent:
     def bb(self):
         if self.goal == None or len(self.graph) < 2:
             return
-        
+        self.no_enqueue = 0
         self.queue = [[0, self.start]]
         Final_result = []
         while len(self.queue) != 0:
@@ -187,10 +200,12 @@ class SearchAgent:
                     continue
                 element = self.queue[0] + [child_node]
                 element[0] += self.graph[choosen_node].children[child_node]
+                self.no_enqueue += 1
                 sub_list.append(element)
                 
                 if self.goal in element:
                     Final_result.append([element])
+                    self.no_enqueue += 1
                     print("GOAL")
                     return Final_result
                 
@@ -210,7 +225,7 @@ class SearchAgent:
     def bb_h(self):
         if self.goal == None or len(self.graph) < 2:
             return
-
+        self.no_enqueue = 0
         self.queue = [[0, self.start]]
         Final_result = []
         while len(self.queue) != 0:
@@ -223,10 +238,10 @@ class SearchAgent:
                 element = self.queue[0] + [child_node]
                 # Update weight
                 element[0] += self.graph[choosen_node].children[child_node]
+                self.no_enqueue += 1
                 # Update heuristc aptly
                 prev_node = element[-2]
                 if prev_node != self.start:
-                    
                     element[0] += (self.graph[child_node].heuristics - self.graph[prev_node].heuristics)
                     #print(element)
                 else:
@@ -237,6 +252,7 @@ class SearchAgent:
                 
                 if self.goal in element:
                     Final_result.append([element])
+                    self.no_enqueue += 1
                     print("GOAL")
                     return Final_result
                 
@@ -254,6 +270,7 @@ class SearchAgent:
     def a_star(self):
         if self.goal == None or len(self.graph) < 2:
             return
+        self.no_enqueue = 0
         # Extended list
         visited = {key : 0 for key in self.graph}
         self.queue = [[0, self.start]]
@@ -270,6 +287,7 @@ class SearchAgent:
                 else:
                     visited[child_node] = 1
                 element = self.queue[0] + [child_node]
+                self.no_enqueue += 1
                 # Update weight
                 element[0] += self.graph[choosen_node].children[child_node]
                 # Update heuristc aptly
@@ -286,6 +304,7 @@ class SearchAgent:
                 
                 if self.goal in element:
                     Final_result.append([element])
+                    self.no_enqueue += 1
                     print("GOAL")
                     return Final_result
                 
