@@ -124,9 +124,6 @@ def update_graph():
             animate = False
 
         any_change = False
-
-
-    
     if agent.status == 'searching':
         #print("Check inside [window.timeout agent_search]")
         window.setTimeout(agent_search, 24)
@@ -170,9 +167,10 @@ def agent_search():
             except Exception as e:
                 print("Exception")
                 #alert("test")
-                document.getElementById("enqueue").innerHTML = agent.no_enqueue;
+                document["paragh"].innerText = "Solved, Total Enqueings : " + str(agent.no_enqueue)
+                #document.getElementById("enqueue").innerHTML = agent.no_enqueue;
                 agent.status = 'idle'
-                document["paragh"].innerText = "Solved"
+                #document["paragh"].innerText = "Solved"
         else:
             Len = len(result[i])
             
@@ -202,9 +200,9 @@ def agent_search():
                 i = 0
                 print("Exception ", e)
                 #alert("test")
-                document.getElementById("enqueue").innerHTML = agent.no_enqueue;
+                document["paragh"].innerText = "Solved, Total Enqueings : " + agent.no_enqueue
+                #document.getElementById("enqueue").innerHTML = agent.no_enqueue;
                 agent.status = 'idle'
-                document["paragh"].innerText = "Solved"
 
             
 def graph_setup(event):
