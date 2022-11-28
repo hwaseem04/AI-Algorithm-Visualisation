@@ -1,5 +1,3 @@
-
-from re import A
 from SearchAgent import SearchAgent
 from Node import Node
 from SavedGraph import *
@@ -61,7 +59,6 @@ def update_graph():
         x1, y1 = agent.graph[node1].position
         x2, y2 = agent.graph[node2].position
 
-        
         ctx.beginPath()
         if flag == 0:
             ctx.strokeStyle = 'black' 
@@ -100,8 +97,8 @@ def update_graph():
                 draw_circle(circle_node)
 
     if any_change:
-        
         ctx.clearRect(0, 0, document['canvas'].offsetWidth, document['canvas'].offsetHeight)
+
         #alert("inside update graph")
         visited = []
         for node in agent.graph.keys():
@@ -138,6 +135,7 @@ def update_graph():
 
 def solve(algo):
     global agent, yield_result, any_change, result
+    document["paragh"].innerText = "Solving"
     agent.status = 'searching'
     if algo in ['bfs','dfs']:
         yield_result = map_algorithm[algo]()
@@ -174,8 +172,10 @@ def agent_search():
                 #alert("test")
                 document.getElementById("enqueue").innerHTML = agent.no_enqueue;
                 agent.status = 'idle'
+                document["paragh"].innerText = "Solved"
         else:
             Len = len(result[i])
+            
             #print("Check inside agent_search", Len)
             try:
                 now_time = javascript.Date.now()
@@ -204,6 +204,7 @@ def agent_search():
                 #alert("test")
                 document.getElementById("enqueue").innerHTML = agent.no_enqueue;
                 agent.status = 'idle'
+                document["paragh"].innerText = "Solved"
 
             
 def graph_setup(event):
@@ -233,8 +234,10 @@ def graph_setup(event):
         return -1
 
     # x and y co-ordinates
-    x = event.x - 240
-    y = event.y - 26
+    x = event.clientX
+    y = event.clientY
+    x = x - canvas.offsetLeft
+    y = y - canvas.offsetTop
     print(x,y)
     node_name = find_node()
     if node_name == -1:
@@ -375,7 +378,6 @@ def graph_setup(event):
         elif tool == "setgoal":
             if node_name != agent.start: # To avoid setting both start and end as goal
                 agent.goal = node_name 
-
                 # To update goal node color
                 any_change = True
 
@@ -418,10 +420,42 @@ def heuristicsUpdate():
 
 def tool_select(do):
     global tool
+    print(do)
+    if do == "nodeAdd":
+        document["paragh"].innerText = "Click to Add Node"
+    elif do == "nodeDelete":
+        document["paragh"].innerText = "Select Node to Delete"
+    elif do == "edgeAdd":
+        document["paragh"].innerText = "Select two nodes to add edge"
+    elif do == "edgeDelete":
+        document["paragh"].innerText = "Select two nodes to delete edge"
+    elif do == "heuristics":
+        document["paragh"].innerText = "Select node to modify heuristics"
+    elif do == "weights":
+        document["paragh"].innerText = "Click on respective weight to modify weights"
+    elif do == "setstart":
+        document["paragh"].innerText = "Select node as Start Node"
+    elif do == "setgoal":
+        document["paragh"].innerText = "Select node as Goal Node"    
+    
     tool = do
 
 def algo_select(algo):
     global selected_algorithm
+    if algo == "bfs":
+        document["paragh"].innerText = "Selected Breadth first search"
+    elif algo == "dfs":
+        document["paragh"].innerText = "Selected Depth first search Node to Delete"
+    elif algo == "hc":
+        document["paragh"].innerText = "Selected Hill climbing"
+    elif algo == "bs":
+        document["paragh"].innerText = "Selected Beam search"
+    elif algo == "bb":
+        document["paragh"].innerText = "Selected Branch and bound"
+    elif algo == "bb-h":
+        document["paragh"].innerText = "Selected Branch and bound + additional heuristics"
+    elif algo == "astar":
+        document["paragh"].innerText = "Selected A Star"
     selected_algorithm = algo
 
 def saved_graph():
@@ -440,13 +474,9 @@ def saved_graph():
     update_graph()
 
 def update_canvas_size():
-    global window_width, window_height
-
-    window_width = window.innerWidth
-    window_height = window.innerHeight
-
-    canvas["width"] = window_width
-    canvas["height"] = window_height
+    inner = document['right']
+    canvas.setAttribute('width', str(inner.offsetWidth));
+    canvas.setAttribute('height',str(inner.offsetHeight));
 
 def set_speed():
     global speed
@@ -465,8 +495,8 @@ ctx = canvas.getContext("2d")
 window_width = window.innerWidth
 window_height = window.innerHeight
 
-canvas["height"] = window_height - 130
-canvas["width"] = window_width - 330
+canvas.setAttribute('width', str(document['right'].offsetWidth));
+canvas.setAttribute('height',str(document['right'].offsetHeight));
 
 node_type = 'normal' 
 border = 'unselected'
