@@ -3,18 +3,26 @@
 A Search Algorithm Visualization tool created as a part of my miniproject. Visit this [page](https://imuhammadwaseem.github.io/AI-Algorithm-Visualisation/) to use the tool.
 
 Following Algorithms are available in this tool (subjected to change/added)
-* Non-Heuristics Based Algorithms
-    * Depth First Search
-    * Breadth First Search
-* Heuristcs Based Algorithms
-    * Hill Climbing
-    * Beam Search
-    * Branch and Bound
-    * Branch and Bound + Heuristics
-    * A Star
+
+```mermaid
+classDiagram
+    Search Algorithms <|-- Heuristics_Based
+    Search Algorithms <|-- Non_Heuristics_Based
+    class Non_Heuristics_Based{
+        ✅ Breadth First Search
+        ✅ Depth First Search
+    }
+    class Heuristics_Based{
+        ✅ Hill Climbing
+        ✅ Beam Search
+        ✅ Branch and Bound
+        ✅ Branch and Bound + Add.Heuristics 
+        ✅ A Star
+    }
+```
 
 ### Methodology
-* HTML, CSS-Bootstrap are used for webpage layout _(Work Pending)_. 
+* HTML, CSS-Bootstrap are used for webpage layout. 
 * To carry out event handling, [brython](https://www.brython.info/) - A Transcompiler from python code to javascript is used (Pretty good though).
 
 ### Usage
@@ -36,4 +44,4 @@ Haven't documented entire code, will do it sometime sooner.
 ### Bugs / Improvements
 
 * Feel free to report bugs, either in code itself or in algorithm.
-* Also welcomed for any optimisation.
+* Also welcomed for Algorithm optimisation.
