@@ -200,7 +200,7 @@ def agent_search():
                 i = 0
                 print("Exception ", e)
                 #alert("test")
-                document["paragh"].innerText = "Solved, Total Enqueings : " + agent.no_enqueue
+                document["paragh"].innerText = "Solved, Total Enqueings : " + str(agent.no_enqueue)
                 #document.getElementById("enqueue").innerHTML = agent.no_enqueue;
                 agent.status = 'idle'
 
