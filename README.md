@@ -1,6 +1,6 @@
 # AI-Algorithm-Visualisation
 
-A Search Algorithm Visualization tool created as a part of my miniproject. Visit this [page](https://imuhammadwaseem.github.io/AI-Algorithm-Visualisation/) to use the tool.
+A Search Algorithm Visualization tool created as a part of my miniproject. Visit this [page](https://hwaseem04.github.io/AI-Algorithm-Visualisation/) to use the tool.
 
 Following Algorithms are available in this tool (subjected to change/added)
 
