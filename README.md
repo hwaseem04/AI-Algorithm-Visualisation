@@ -27,7 +27,7 @@ classDiagram
 
 ### Usage
 
-* Watch this short Youtube video ([Working on]()) to find out how to use it.
+* Watch this short [Youtube video](https://youtu.be/Q3MnSeCIi_w) to check out how to use it.
 
 ### Files
 
