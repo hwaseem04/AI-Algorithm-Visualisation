@@ -50,7 +50,7 @@ def update_graph():
         ctx.font = "20px Arial"
         ctx.textBaseline = "middle"
         ctx.fillText(node, x, y - 5)
-        #print(x,y)
+
 
         draw_heuristics(node)
 
@@ -76,7 +76,6 @@ def update_graph():
     def animate_graph():
         global node_type, val, selected_algorithm
 
-        #print("inside animate", val)
         if selected_algorithm not in ['dfs', 'bfs']:
             val = val[1:]
         
@@ -125,7 +124,6 @@ def update_graph():
 
         any_change = False
     if agent.status == 'searching':
-        #print("Check inside [window.timeout agent_search]")
         window.setTimeout(agent_search, 24)
     
     
@@ -136,17 +134,14 @@ def solve(algo):
     agent.status = 'searching'
     if algo in ['bfs','dfs']:
         yield_result = map_algorithm[algo]()
-        print("Started result")
         update_graph()
     else:
         result = map_algorithm[algo]()
-        print("Else", result)
         update_graph()
 
     
 def next_iteration():
     global yield_result, val
-    #print("ok inside 'next_iteration'")
     val = next(yield_result)
 
 def agent_search():
@@ -166,19 +161,14 @@ def agent_search():
                     update_graph()
             except Exception as e:
                 print("Exception")
-                #alert("test")
                 document["paragh"].innerText = "Solved, Total Enqueings : " + str(agent.no_enqueue)
-                #document.getElementById("enqueue").innerHTML = agent.no_enqueue;
                 agent.status = 'idle'
-                #document["paragh"].innerText = "Solved"
         else:
             Len = len(result[i])
             
-            #print("Check inside agent_search", Len)
             try:
                 now_time = javascript.Date.now()
                 if now_time - start_time >= speed:
-                    #print(i,j)
                     if j < Len:
                         val = result[i][j]
                         j += 1
@@ -187,21 +177,16 @@ def agent_search():
                         i += 1
                         val = result[i][j]
                         j += 1
-                        """update_graph()"""
-                    print("After ", i,j)
                     any_change = True
                     animate = True
                     window.setTimeout(update_graph, 10)
                     start_time = now_time
                 else:
-                    print("---------")
                     update_graph()
             except Exception as e:
                 i = 0
                 print("Exception ", e)
-                #alert("test")
                 document["paragh"].innerText = "Solved, Total Enqueings : " + str(agent.no_enqueue)
-                #document.getElementById("enqueue").innerHTML = agent.no_enqueue;
                 agent.status = 'idle'
 
             
@@ -236,7 +221,6 @@ def graph_setup(event):
     y = event.clientY
     x = x - canvas.offsetLeft
     y = y - canvas.offsetTop
-    print(x,y)
     node_name = find_node()
     if node_name == -1:
         if tool == "nodeAdd":
@@ -418,7 +402,7 @@ def heuristicsUpdate():
 
 def tool_select(do):
     global tool
-    print(do)
+
     if do == "nodeAdd":
         document["paragh"].innerText = "Click to Add Node"
     elif do == "nodeDelete":
