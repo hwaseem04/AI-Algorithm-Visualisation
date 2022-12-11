@@ -146,22 +146,22 @@ def agent_search():
     global any_change, start_time, animate, selected_algorithm, result, val, i, j
     set_speed()
     if agent.status == 'searching':
-        if selected_algorithm == 'dfs':
-            Len = len(result)
-            if (i == Len):
-                document["paragh"].innerText = "Solved, Total Enqueings : " + str(agent.no_enqueue)
-                agent.status = 'idle'
-                return 
-            now_time = javascript.Date.now()
-            if (now_time - start_time >= speed):
-                val = result[i]
-                i += 1
-                any_change = True
-                animate = True
-                window.setTimeout(update_graph, 10)
-                start_time = now_time
-            else:
-                window.setTimeout(update_graph, 10)
+        #if selected_algorithm == 'dfs':
+        Len = len(result)
+        if (i == Len):
+            document["paragh"].innerText = "Solved, Total Enqueings : " + str(agent.no_enqueue)
+            agent.status = 'idle'
+            return 
+        now_time = javascript.Date.now()
+        if (now_time - start_time >= speed):
+            val = result[i]
+            i += 1
+            any_change = True
+            animate = True
+            window.setTimeout(update_graph, 10)
+            start_time = now_time
+        else:
+            window.setTimeout(update_graph, 10)
             
 def graph_setup(event):
     global tool, counter, any_change, node_selected, selected_node_, From, To, node_heur
