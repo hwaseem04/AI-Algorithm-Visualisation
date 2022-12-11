@@ -11,36 +11,32 @@ class SearchAgent:
         self.no_enqueue = 0
 
     def dfs(self):
-        if self.goal == None or len(self.graph) < 2:
+        if self.goal == None or self.start == None or len(self.graph) < 2:
             return
-        """print(self.graph)
-        print(self.start)
-        print(self.goal)"""
+
         self.no_enqueue = 0
-        queue = []
-        for child_node in self.graph[self.start].children.keys():
-            self.no_enqueue += 1
-            queue.append([self.start, child_node])
-        
-        queue = sorted(queue)
-
-        while(len(queue) != 0):
-            current_node = queue[0][-1]
-
+        Final_result = []
+        self.queue = [[self.start]]
+        flag = 0
+        while(len(self.queue) != 0):
+            current_path = self.queue.pop(0)
+            current_node = current_path[-1]
             if current_node == self.goal:
-                print("Final Path : ", queue[0])
-                yield queue.pop(0)
+                flag = 1
                 break
 
             for child_node in self.graph[current_node].children.keys():
-                if child_node not in queue[0]:
-                    temp = queue[0] + [child_node]
+                if child_node not in current_path:
+                    self.queue.append(current_path + [child_node])
                     self.no_enqueue += 1
-                    queue.insert(1,temp)
-            yield queue.pop(0)
             
-            queue = sorted(queue)
-        self.status = 'idle'
+            self.queue = sorted(self.queue)
+            if (len(self.queue) != 0):
+                Final_result.append(self.queue[0])
+        if (flag == 0):
+            return None
+        print(Final_result)
+        return Final_result
         
 
 
