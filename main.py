@@ -76,24 +76,20 @@ def update_graph():
     def animate_graph():
         global node_type, val, selected_algorithm
 
-        if selected_algorithm not in ['dfs', 'bfs']:
-            val = val[1:]
-        
-        for iter in range(1):
-            start = val[0]
-            for node in val[1:]:
-                end = node
-                print("start : ",start,"End : ",end)
-                draw_edges(start, end, 1)
-                start = end
-            for circle_node in agent.graph.keys():
-                if agent.start == circle_node:
-                    node_type = 'start'
-                elif agent.goal == circle_node:
-                    node_type = 'goal'
-                else:
-                    node_type = 'normal'
-                draw_circle(circle_node)
+        for circle_node in agent.graph.keys():
+            if agent.start == circle_node:
+                node_type = 'start'
+            elif agent.goal == circle_node:
+                node_type = 'goal'
+            else:
+                node_type = 'normal'
+            draw_circle(circle_node)
+        start = val[0]
+        for node in val[1:]:
+            end = node
+            print("start : ",start,"End : ",end)
+            draw_edges(start, end, 1)
+            start = end
 
     if any_change:
         ctx.clearRect(0, 0, document['canvas'].offsetWidth, document['canvas'].offsetHeight)
@@ -129,15 +125,17 @@ def update_graph():
     
 
 def solve(algo):
-    global agent, yield_result, any_change, result
+    global agent, yield_result, any_change, result, i
     document["paragh"].innerText = "Solving"
     agent.status = 'searching'
-    if algo in ['bfs','dfs']:
-        yield_result = map_algorithm[algo]()
-        update_graph()
-    else:
-        result = map_algorithm[algo]()
-        update_graph()
+    i = 0
+    result = map_algorithm[algo]()
+    if (result == None):
+        document["paragh"].innerText = "Can't find"
+        agent.status = 'idle'
+        return
+    
+    update_graph()
 
     
 def next_iteration():
@@ -148,47 +146,22 @@ def agent_search():
     global any_change, start_time, animate, selected_algorithm, result, val, i, j
     set_speed()
     if agent.status == 'searching':
-        if selected_algorithm in ['bfs','dfs']:
-            try:
-                now_time = javascript.Date.now()
-                if now_time - start_time >= speed:
-                    next_iteration()
-                    any_change = True
-                    animate = True
-                    window.setTimeout(update_graph, 10)
-                    start_time = now_time
-                else:
-                    update_graph()
-            except Exception as e:
-                print("Exception")
+        if selected_algorithm == 'dfs':
+            Len = len(result)
+            if (i == Len):
                 document["paragh"].innerText = "Solved, Total Enqueings : " + str(agent.no_enqueue)
                 agent.status = 'idle'
-        else:
-            Len = len(result[i])
-            
-            try:
-                now_time = javascript.Date.now()
-                if now_time - start_time >= speed:
-                    if j < Len:
-                        val = result[i][j]
-                        j += 1
-                    else:
-                        j = 0
-                        i += 1
-                        val = result[i][j]
-                        j += 1
-                    any_change = True
-                    animate = True
-                    window.setTimeout(update_graph, 10)
-                    start_time = now_time
-                else:
-                    update_graph()
-            except Exception as e:
-                i = 0
-                print("Exception ", e)
-                document["paragh"].innerText = "Solved, Total Enqueings : " + str(agent.no_enqueue)
-                agent.status = 'idle'
-
+                return 
+            now_time = javascript.Date.now()
+            if (now_time - start_time >= speed):
+                val = result[i]
+                i += 1
+                any_change = True
+                animate = True
+                window.setTimeout(update_graph, 10)
+                start_time = now_time
+            else:
+                window.setTimeout(update_graph, 10)
             
 def graph_setup(event):
     global tool, counter, any_change, node_selected, selected_node_, From, To, node_heur
@@ -359,6 +332,7 @@ def graph_setup(event):
 
         elif tool == "setgoal":
             if node_name != agent.start: # To avoid setting both start and end as goal
+
                 agent.goal = node_name 
                 # To update goal node color
                 any_change = True
