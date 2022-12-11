@@ -76,6 +76,12 @@ def update_graph():
     def animate_graph():
         global node_type, val, selected_algorithm
 
+        start = val[0]
+        for node in val[1:]:
+            end = node
+            print("start : ",start,"End : ",end)
+            draw_edges(start, end, 1)
+            start = end
         for circle_node in agent.graph.keys():
             if agent.start == circle_node:
                 node_type = 'start'
@@ -84,12 +90,6 @@ def update_graph():
             else:
                 node_type = 'normal'
             draw_circle(circle_node)
-        start = val[0]
-        for node in val[1:]:
-            end = node
-            print("start : ",start,"End : ",end)
-            draw_edges(start, end, 1)
-            start = end
 
     if any_change:
         ctx.clearRect(0, 0, document['canvas'].offsetWidth, document['canvas'].offsetHeight)
