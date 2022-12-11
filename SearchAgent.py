@@ -44,46 +44,42 @@ class SearchAgent:
         if self.goal == None or self.start == None or len(self.graph) < 2: ## Create a dialog box to notify user
             return
         self.no_enqueue = 0
-        queue = []
-        for child in self.graph[self.start].children.keys():
-            self.no_enqueue += 1
-            queue.append([self.start, child])
-            
-        queue = sorted(queue)
-        print(queue)
-
-        for yield_value in queue:
-            yield yield_value
-            if self.goal in yield_value:
-                self.status = 'idle'
-                return
-            
-        while(len(queue) != 0):
-            length = len(queue)
+        Final_result = []
+        self.queue = [[self.start]]
+        flag = 0
+        goalpath = []
+        while(len(self.queue) != 0):
+            length = len(self.queue)
+            new_extension = []
             for k in range(length):
-                current_node = queue[k][-1]
+                current_path = self.queue[k]
+                current_node = current_path[-1]
                 for child in self.graph[current_node].children.keys() :
-                    if child not in queue[k]:
-                        temp = queue[k] + [child]
+                    if child not in current_path:
+                        temp = current_path + [child]
+                        new_extension.append(temp)
+                        self.queue.append(temp)
                         self.no_enqueue += 1
-                        queue.append(temp)
-                    
-            queue = queue[length:]
-            queue = sorted(queue)
-            print(queue)
-            if len(queue) == 0:
-                break
-            for yield_value in queue:
-                yield yield_value
-                if self.goal in yield_value:
-                    self.status = 'idle'
-                    return
+                        if(child == self.goal):
+                            flag = 1
+                            goalpath = temp
+                            print(temp)
+                            break
             
-            for i in queue:
-                if self.goal in i:
-                    print("GOAL : ", i)
-                    self.status = 'idle'
-                    return
+            new_extension = sorted(new_extension)
+            Final_result.extend(new_extension)
+            if (flag == 1):
+                break
+
+            self.queue = self.queue[length:]
+            self.queue = sorted(self.queue)
+        if (flag == 0):
+            return None
+        index = Final_result.index(goalpath)
+        Final_result = Final_result[:index+1]
+        print(Final_result)
+        return Final_result
+
     def hc(self):
         if self.goal == None or len(self.graph) < 2:
             return
