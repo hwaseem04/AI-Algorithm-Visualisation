@@ -12,7 +12,7 @@ class SearchAgent:
 
     def dfs(self):
         if self.goal == None or self.start == None or len(self.graph) < 2:
-            return
+            return None
 
         self.no_enqueue = 0
         Final_result = []
@@ -42,7 +42,7 @@ class SearchAgent:
 
     def bfs(self):
         if self.goal == None or self.start == None or len(self.graph) < 2: ## Create a dialog box to notify user
-            return
+            return None
         self.no_enqueue = 0
         Final_result = []
         self.queue = [[self.start]]
