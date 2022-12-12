@@ -75,7 +75,8 @@ def update_graph():
     
     def animate_graph():
         global node_type, val, selected_algorithm
-
+        if (selected_algorithm not in ['bfs', 'dfs']):
+            val = val[1:]
         start = val[0]
         for node in val[1:]:
             end = node
