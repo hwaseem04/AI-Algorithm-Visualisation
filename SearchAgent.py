@@ -269,58 +269,62 @@ class SearchAgent:
         
 
     def a_star(self):
-        if self.goal == None or len(self.graph) < 2:
-            return
+        if self.goal == None or self.start == None or len(self.graph) < 2:
+            return None
         self.no_enqueue = 0
         # Extended list
         visited = {key : 0 for key in self.graph}
         self.queue = [[0, self.start]]
         Final_result = []
+        flag = 0
+        goal_path = []
         while len(self.queue) != 0:
             sub_list = []
-            #temp = self.queue[0]
-            choosen_node = self.queue[0][-1]
+            current_path = self.queue.pop(0)
+            choosen_node = current_path[-1]
             for child_node in self.graph[choosen_node].children.keys():
-                if child_node in self.queue[0]:
+                if child_node in current_path:
                     continue
                 if visited[child_node] == 1:
                     continue
                 else:
                     visited[child_node] = 1
-                element = self.queue[0] + [child_node]
-                self.no_enqueue += 1
+                element =  current_path + [child_node]
+                
                 # Update weight
                 element[0] += self.graph[choosen_node].children[child_node]
                 # Update heuristc aptly
                 prev_node = element[-2]
                 if prev_node != self.start:
-                    
                     element[0] += (self.graph[child_node].heuristics - self.graph[prev_node].heuristics)
-                    #print(element)
                 else:
-                    
                     element[0] += (self.graph[child_node].heuristics)
-                    #print(element)
+                priority_queue(self.queue, element)
                 sub_list.append(element)
+                self.no_enqueue += 1
                 
-                if self.goal in element:
-                    Final_result.append([element])
-                    self.no_enqueue += 1
-                    print("GOAL")
-                    return Final_result
-                
-            self.queue.pop(0)
+                if (self.goal == child_node):
+                    flag = 1
+                    goal_path = element
+                    break
+
             if len(sub_list) == 0:
                 continue
             sub_list = sorted(sub_list)
-            for elem in sub_list:
-                self.priority_queue(elem)
-            
-            Final_result.append(sub_list)
-            print(sub_list)
-            print(self.queue)
+            sub_list2 = sub_list.copy()
+            for elem in sub_list2:
+                priority_queue(sub_list, elem)
+            Final_result.extend(sub_list)
+
+            if (flag == 1):
+                break
             print("-------------")
-        
+        if (flag != 1):
+            return None
+        index = Final_result.index(goal_path)
+        Final_result = Final_result[:index+1]
+        print(Final_result)
+        return Final_result
     
 def priority_queue(queue, element):
     if len(queue) == 0:
