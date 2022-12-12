@@ -178,39 +178,43 @@ class SearchAgent:
                 return Final_result
 
     def bb(self):
-        if self.goal == None or len(self.graph) < 2:
+        if self.goal == None or self.start == None or len(self.graph) < 2:
             return
         self.no_enqueue = 0
         self.queue = [[0, self.start]]
         Final_result = []
+        flag = 0
+        goal_node = []
         while len(self.queue) != 0:
             sub_list = []
-            #temp = self.queue[0]
-            choosen_node = self.queue[0][-1]
+            current_path =  self.queue.pop(0)
+            choosen_node = current_path[-1]
             for child_node in self.graph[choosen_node].children.keys():
-                if child_node in self.queue[0]:
+                if child_node in current_path:
                     continue
-                element = self.queue[0] + [child_node]
+                element = current_path + [child_node]
                 element[0] += self.graph[choosen_node].children[child_node]
-                self.no_enqueue += 1
+                
                 sub_list.append(element)
-                
-                if self.goal in element:
-                    Final_result.append([element])
-                    self.no_enqueue += 1
-                    print("GOAL")
-                    return Final_result
-                
-            self.queue.pop(0)
+                priority_queue(self.queue, element)
+                self.no_enqueue += 1
+
+                if self.goal == child_node:
+                    flag = 1
+                    goal_node = element
+                    break
             sub_list = sorted(sub_list)
             for elem in sub_list:
-                self.priority_queue(elem)
-            
-            Final_result.append(sub_list)
-            print(sub_list)
-            print(self.queue)
+                priority_queue(Final_result, elem)
+            if (flag == 1):
+                break
             print("-------------")
-
+        if (flag != 1):
+            return None
+        index = Final_result.index(goal_node)
+        Final_result = Final_result[:index+1]
+        print(Final_result)
+        return Final_result
 
 
         
