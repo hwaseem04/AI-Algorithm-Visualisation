@@ -312,32 +312,30 @@ class SearchAgent:
             print(self.queue)
             print("-------------")
         
-    def priority_queue(self, element):
-        
-        if len(self.queue) == 0:
-            selected_index = None
-            self.queue.append(element)
-        else:
-            selected_index = -1
-            for i in range(len(self.queue)):
-                if element[0] < self.queue[i][0]:
+    
+def priority_queue(queue, element):
+    if len(queue) == 0:
+        selected_index = None
+        queue.append(element)
+    else:
+        selected_index = -1
+        for i in range(len(queue)):
+            if element[0] < queue[i][0]:
+                selected_index = i
+                break
+            elif element[0] > queue[i][0]:
+                selected_index = i + 1
+                continue
+            else:
+                if len(element) < len(queue[i]):
                     selected_index = i
-                    break
-                elif element[0] > self.queue[i][0]:
-                    selected_index = i + 1
-                    continue
-                else:
-                    if len(element) < len(self.queue[i]):
+                elif len(element) == len(queue[i]):
+                    if element[-1] < queue[i][-1]:
                         selected_index = i
-                    elif len(element) == len(self.queue[i]):
-                        if element[-1] < self.queue[i][-1]:
-                            selected_index = i
-                        else:
-                            selected_index = i + 1
-                            continue
                     else:
                         selected_index = i + 1
-                    break
-            self.queue.insert(selected_index, element)
-                    
-        #print("Inside priority queue :", selected_index, self.queue)
+                        continue
+                else:
+                    selected_index = i + 1
+                break
+        queue.insert(selected_index, element)
