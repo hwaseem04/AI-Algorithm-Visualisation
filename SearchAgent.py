@@ -70,7 +70,6 @@ class SearchAgent:
             Final_result.extend(new_extension)
             if (flag == 1):
                 break
-
             self.queue = self.queue[length:]
             self.queue = sorted(self.queue)
         if (flag == 0):
@@ -81,43 +80,50 @@ class SearchAgent:
         return Final_result
 
     def hc(self):
-        if self.goal == None or len(self.graph) < 2:
-            return
+        if self.goal == None or self.start == None or len(self.graph) < 2:
+            return None
         self.no_enqueue = 0
         Final_result = []
         self.queue = [[int(self.graph[self.start].heuristics), self.start]]
 
-        i = 0
+        flag = 0
+        goal_path = []
         while len(self.queue) != 0:
             sub_list = []
-            temp = self.queue[0]
-            choosen_node = self.queue[0][-1]
-            for child_node in self.graph[choosen_node].children.keys():
-                if child_node in self.queue[0]:
-                    continue
-                element = self.queue[0] + [child_node]
-                self.no_enqueue += 1
-                element[0] = int(self.graph[child_node].heuristics)
-                #print(element)
-                sub_list.append(element)
-                #self.priority_queue(element)
-                if self.goal in element:
-                    self.no_enqueue += 1
-                    Final_result.append([element])
-                    print("GOAL")
-                    return Final_result
-            
-            sub_list = sorted(sub_list)
-            print("SUB LIST" ,sub_list)
-            self.queue.remove(temp)
+            current_path = self.queue.pop(0)
+            choosen_node = current_path[-1]
 
+            if (self.goal == choosen_node):
+                goal_path = current_path
+                flag = 1
+                break
+            
+            for child_node in self.graph[choosen_node].children.keys():
+                if child_node in current_path :
+                    continue
+                element = current_path + [child_node]
+                element[0] = int(self.graph[child_node].heuristics)
+                sub_list.append(element)
+                self.no_enqueue += 1
+
+            sub_list = sorted(sub_list)
+            print(sub_list)
             for elem in sub_list[-1::-1]:
                 self.queue.insert(0,elem)
-            print("SELF queue ",self.queue)
-            Final_result.append([self.queue[0]])
 
-            
-            i += 1
+            if (len(self.queue) != 0):
+                Final_result.extend([self.queue[0]])
+
+            if (flag == 1):
+                break
+        if (flag == 0):
+            return None
+        # print(self.goal)
+        # print(Final_result)
+        # print(goal_path)
+        index = Final_result.index(goal_path)
+        Final_result = Final_result[:index+1]
+        return Final_result
 
 
     def bs(self):
