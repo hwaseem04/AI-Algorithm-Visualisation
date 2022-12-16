@@ -127,61 +127,56 @@ class SearchAgent:
 
 
     def bs(self):
-        if self.goal == None or len(self.graph) < 2:
-            return
-        # Beam search
+        if self.goal == None or self.start == None or len(self.graph) < 2:
+            return None
         self.no_enqueue = 0
-        B = 3
+        B = 3 # Default beam width
         Final_result = []
-        self.queue = []
-
-        for child_node in self.graph[self.start].children.keys():
-            element = [int(self.graph[child_node].heuristics), self.start, child_node]
-            #print(element)
-            self.priority_queue(element)
-            self.no_enqueue += 1
-            if self.goal in element:
-                self.no_enqueue += 1
-                Final_result.append([element])
-                print(Final_result)
-                print("GOAL")
-                return Final_result
-
-        self.queue = self.queue[:B]
-        Final_result.append(self.queue.copy())
-        #print(Final_result)
+        self.queue = [[int(self.graph[self.start].heuristics), self.start]]
+        flag = 0
+        goal_path = []
         
         while len(self.queue) != 0:
             temp_queue = self.queue.copy()
             K = len(temp_queue)
+            extension = []
             for i in range(K):
-                choosen_node = temp_queue[i][-1]
+                choosen_path = self.queue.pop(0)
+                choosen_node = choosen_path[-1]
                 for child_node in self.graph[choosen_node].children.keys():
-                    if child_node in temp_queue[i]:  # To avoid tail biting
+                    if child_node in choosen_path:  # To avoid tail biting
                         continue 
-                    element = temp_queue[i] + [child_node]
-                    self.no_enqueue += 1
+                    element = choosen_path + [child_node]
                     element[0] = int(self.graph[child_node].heuristics)
-                    #print(element)
-                    self.priority_queue(element)
-                    
-                    if self.goal in element:
-                        Final_result.append([element])
-                        self.no_enqueue += 1
-                        print(Final_result)
-                        print("GOAL")
-                        return Final_result
+                    priority_queue(extension, element)
+                    self.no_enqueue += 1
 
-                #print("1",self.queue,"------", temp_queue)
-                del self.queue[self.queue.index(temp_queue[i])]
-                #print("2",self.queue,"------", temp_queue)
-            self.queue = self.queue[:B].copy()
-            print(Final_result,"------")
-            Final_result.append(self.queue.copy())
-            print(Final_result,"------", self.queue)
+                    if self.goal == child_node:
+                        flag = 1
+                        goal_path = element
+
+            
+            self.queue = extension.copy()
+            if flag == 1:
+                Final_result.extend(self.queue.copy())
+                print(self.queue, goal_path)  
+                break
+            else:
+                self.queue = self.queue[:B].copy()
+                Final_result.extend(self.queue.copy())
+                print(self.queue, goal_path)  
+                
+            
             # Kind of dead lock case condition below
             if self.queue == []:
-                return Final_result
+                break
+
+        if flag == 0:
+            return None
+        index = Final_result.index(goal_path)
+        Final_result = Final_result[:index+1]
+        print(Final_result)
+        return Final_result
 
     def bb(self):
         if self.goal == None or self.start == None or len(self.graph) < 2:
