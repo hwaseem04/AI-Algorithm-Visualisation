@@ -402,7 +402,7 @@ def algo_select(algo):
     if algo == "bfs":
         document["paragh"].innerText = "Selected Breadth first search"
     elif algo == "dfs":
-        document["paragh"].innerText = "Selected Depth first search Node to Delete"
+        document["paragh"].innerText = "Selected Depth first search"
     elif algo == "hc":
         document["paragh"].innerText = "Selected Hill climbing"
     elif algo == "bs":
