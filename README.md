@@ -45,3 +45,4 @@ Haven't documented entire code, will do it sometime sooner.
 
 * Feel free to report bugs, either in code itself or in algorithm.
 * Also welcomed for Algorithm optimisation.
+* Make a PR, if you want to add more **default graphs**.
